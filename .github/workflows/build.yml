@@ -1,0 +1,29 @@
+name: Build Atlas Geologia
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extrair projeto
+        run: unzip -q ./*.zip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.5
+      - name: Compilar
+        working-directory: proj
+        run: gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: atlas-geologia-jar
+          path: |
+            proj/build/libs/*.jar
+            !proj/build/libs/*-sources.jar
+          if-no-files-found: error
